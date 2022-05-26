@@ -1,0 +1,6 @@
+FROM registry.access.redhat.com/ubi8/ubi:latest
+
+ADD files/oc-4.10.5-linux.tar.gz /usr/local/bin
+ADD files/kubectl-kuttl_0.12.1_linux_x86_64 /usr/local/bin/kubectl-kuttl
+
+RUN dnf install -y git
