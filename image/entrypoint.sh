@@ -17,8 +17,8 @@ if [[ -z "${OCP_SERVER}" ]] || [[ -z "${OCP_PASS}" ]]; then
   exit 1
 fi
 TMPDIR="$(mktemp -d)"
-KUTTL_REPO="${KUTTL_REPO:-'https://gitlab.cee.redhat.com/gitops/operator-e2e/'}"
-OCP_USER="${OCP_USER:-'kubeadmin'}"
+KUTTL_REPO="${KUTTL_REPO:-"https://gitlab.cee.redhat.com/gitops/operator-e2e.git"}"
+OCP_USER="${OCP_USER:-"kubeadmin"}"
 
 ## TRAP
 trap_exit() {
@@ -40,7 +40,7 @@ trap_err() {
       local called="Called at line ${linecallfunc}"
     fi
     print_log "DEBUG: Error in ${funcstack}. ${called}"
-    print_log "DEBUG: \e[1;31m $(sed "${linecallfunc}!d" ${0})\e[0m"
+    [[ "${linecallfunc}" != "0" ]] && print_log "DEBUG: \e[1;31m $(sed "${linecallfunc}!d" ${0})\e[0m"
   fi
 }
 
@@ -49,7 +49,9 @@ trap 'trap_err ${?} ${LINENO} ${BASH_LINENO} ${BASH_COMMAND} $(printf "::%s" ${F
 
 ## FUNCTIONS
 clone_repo() {
-  git clone "${KUTTL_REPO}" "${TMPDIR}"
+  print_log "INFO: Cloning Kuttl repo: ${KUTTL_REPO}"
+  git clone "${KUTTL_REPO}" "${TMPDIR}/operator-e2e" > /dev/null 2>&1 \
+  && print_log "INFO: Successfully cloned ${KUTTL_REPO}"
 }
 
 oc_login() {
@@ -61,7 +63,7 @@ oc_login() {
 
 run_tests() {
   pushd "${TMPDIR}/operator-e2e/gitops-operator"
-  kubectl kuttl test ./tests/sequential --config ./tests/sequential/kuttl-test.yaml --test 1-001_validate_kam_service
+  kubectl kuttl test ./tests/parallel --config ./tests/parallel/kuttl-test.yaml --test 1-021_validate_rolebindings
   popd
 }
 
@@ -69,4 +71,4 @@ run_tests() {
 ## RUN
 clone_repo
 #oc_login
-#run_tests
+run_tests
