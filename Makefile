@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 USER_NAME = $(shell whoami)
-TAG ?= "quay.io/$(USER_NAME)/oc-containerized"
+TAG ?= "quay.io/$(USER_NAME)/kontainerized-kuttl"
 
 # Color and Formatting
 RED =\e[91m#  Red color
