@@ -2,7 +2,7 @@
 #
 # This script will:
 # 1. Git clone the latest kuttl test repo.
-# 2. Oc login into the target remote OCP server.
+# 2. Oc login into the target remote OCP server (requires $OCP_SERVER and $OCP_PASS env vars)
 # 3. Run E2E tests from the Kuttl suite repo.
 set -Eeo pipefail
 
@@ -11,6 +11,7 @@ print_log() {
   echo -e "${timestamp} - ${@}"
 }
 
+
 ## VARIABLES
 if [[ -z "${OCP_SERVER}" ]] || [[ -z "${OCP_PASS}" ]]; then
   print_log "Missing environment variable: OCP_SERVER and/or OCP_PASS"
@@ -18,7 +19,9 @@ if [[ -z "${OCP_SERVER}" ]] || [[ -z "${OCP_PASS}" ]]; then
 fi
 TMPDIR="$(mktemp -d)"
 KUTTL_REPO="${KUTTL_REPO:-"https://gitlab.cee.redhat.com/gitops/operator-e2e.git"}"
+REPO_DIR="${REPO_DIR:-"operator-e2e"}"
 OCP_USER="${OCP_USER:-"kubeadmin"}"
+
 
 ## TRAP
 trap_exit() {
@@ -40,35 +43,40 @@ trap_err() {
       local called="Called at line ${linecallfunc}"
     fi
     print_log "DEBUG: Error in ${funcstack}. ${called}"
-    [[ "${linecallfunc}" != "0" ]] && print_log "DEBUG: \e[1;31m $(sed "${linecallfunc}!d" ${0})\e[0m"
+    [[ "${linecallfunc}" != "0" ]] && print_log "DEBUG: $(sed "${linecallfunc}!d" ${0})"
   fi
 }
 
 trap 'trap_exit ${?}' EXIT SIGINT SIGTERM
 trap 'trap_err ${?} ${LINENO} ${BASH_LINENO} ${BASH_COMMAND} $(printf "::%s" ${FUNCNAME[@]:-})' ERR
 
+
 ## FUNCTIONS
 clone_repo() {
-  print_log "INFO: Cloning Kuttl repo: ${KUTTL_REPO}"
-  git clone "${KUTTL_REPO}" "${TMPDIR}/operator-e2e" > /dev/null 2>&1 \
-  && print_log "INFO: Successfully cloned ${KUTTL_REPO}"
+    print_log "INFO: Cloning Kuttl repo: ${KUTTL_REPO}"
+    git clone "${KUTTL_REPO}" "${TMPDIR}/${REPO_DIR}" &> /dev/null || return 2
+    print_log "INFO: Successfully cloned ${KUTTL_REPO}"
 }
 
 oc_login() {
+  print_log "INFO: Loging into ${OCP_SERVER}"
   oc login --insecure-skip-tls-verify=true \
   --username="${OCP_USER}" \
   --password="${OCP_PASS}" \
-  "${OCP_SERVER}"
+  "${OCP_SERVER}" || return 3
+  print_log "Info: Successfully loged into OCP cluster"
 }
 
 run_tests() {
   pushd "${TMPDIR}/operator-e2e/gitops-operator"
-  kubectl kuttl test ./tests/parallel --config ./tests/parallel/kuttl-test.yaml --test 1-021_validate_rolebindings
+  kubectl kuttl test ./tests/parallel \
+  --config ./tests/parallel/kuttl-test.yaml \
+  --test 1-021_validate_rolebindings || return 4
   popd
 }
 
 
 ## RUN
-clone_repo
-#oc_login
-run_tests
+{ clone_repo; } || { print_log "ERROR: Unable to clone Kuttl repo"; exit 2; }
+{ oc_login; } || { print_log "ERROR: Unable to login into OCP API"; exit 3; }
+# { run_tests; } || {}
