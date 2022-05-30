@@ -79,4 +79,4 @@ run_tests() {
 ## RUN
 { clone_repo; } || { print_log "ERROR: Unable to clone Kuttl repo"; exit 2; }
 { oc_login; } || { print_log "ERROR: Unable to login into OCP API"; exit 3; }
-# { run_tests; } || {}
+{ run_tests; } || { print_log "ERROR: Unable to run Kuttl tests"; exit 4; }
