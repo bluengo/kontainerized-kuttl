@@ -27,6 +27,7 @@ OCP_USER="${OCP_USER:-"kubeadmin"}"
 trap_exit() {
   print_log "INFO: Exited with status ${1}"
   rm -rf "${TMPDIR}"
+  oc logout
 }
 
 trap_err() {
@@ -53,9 +54,9 @@ trap 'trap_err ${?} ${LINENO} ${BASH_LINENO} ${BASH_COMMAND} $(printf "::%s" ${F
 
 ## FUNCTIONS
 clone_repo() {
-    print_log "INFO: Cloning Kuttl repo: ${KUTTL_REPO}"
-    git clone "${KUTTL_REPO}" "${TMPDIR}/${REPO_DIR}" &> /dev/null || return 2
-    print_log "INFO: Successfully cloned ${KUTTL_REPO}"
+  print_log "INFO: Cloning Kuttl repo: ${KUTTL_REPO}"
+  git clone "${KUTTL_REPO}" "${TMPDIR}/${REPO_DIR}" &> /dev/null || return 2
+  print_log "INFO: Successfully cloned ${KUTTL_REPO}"
 }
 
 oc_login() {
@@ -63,12 +64,15 @@ oc_login() {
   oc login --insecure-skip-tls-verify=true \
   --username="${OCP_USER}" \
   --password="${OCP_PASS}" \
-  "${OCP_SERVER}" || return 3
+  "${OCP_SERVER}" &> /dev/null || return 3
   print_log "Info: Successfully loged into OCP cluster"
 }
 
 run_tests() {
   pushd "${TMPDIR}/operator-e2e/gitops-operator"
+  #
+  ## TODO:
+  ### Run all E2E suite and save result
   kubectl kuttl test ./tests/parallel \
   --config ./tests/parallel/kuttl-test.yaml \
   --test 1-021_validate_rolebindings || return 4
