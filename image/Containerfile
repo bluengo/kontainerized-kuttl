@@ -2,5 +2,8 @@ FROM registry.access.redhat.com/ubi8/ubi:latest
 
 ADD files/oc-4.10.5-linux.tar.gz /usr/local/bin
 ADD files/kubectl-kuttl_0.12.1_linux_x86_64 /usr/local/bin/kubectl-kuttl
+ADD ./entrypoint.sh /usr/local/bin
 
 RUN dnf install -y git
+
+CMD [ "/usr/local/bin/entrypoint.sh" ]

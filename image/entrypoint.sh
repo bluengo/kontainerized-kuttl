@@ -27,7 +27,7 @@ OCP_USER="${OCP_USER:-"kubeadmin"}"
 trap_exit() {
   print_log "INFO: Exited with status ${1}"
   rm -rf "${TMPDIR}"
-  oc logout
+  oc logout || true
 }
 
 trap_err() {
@@ -55,7 +55,7 @@ trap 'trap_err ${?} ${LINENO} ${BASH_LINENO} ${BASH_COMMAND} $(printf "::%s" ${F
 ## FUNCTIONS
 clone_repo() {
   print_log "INFO: Cloning Kuttl repo: ${KUTTL_REPO}"
-  git clone "${KUTTL_REPO}" "${TMPDIR}/${REPO_DIR}" &> /dev/null || return 2
+  git -c http.sslVerify=false clone "${KUTTL_REPO}" "${TMPDIR}/${REPO_DIR}" &> /dev/null || return 2
   print_log "INFO: Successfully cloned ${KUTTL_REPO}"
 }
 
@@ -69,7 +69,7 @@ oc_login() {
 }
 
 run_tests() {
-  pushd "${TMPDIR}/operator-e2e/gitops-operator"
+  pushd "${TMPDIR}/operator-e2e/gitops-operator" &> /dev/null
   #
   ## TODO:
   ### Run all E2E suite and save result
