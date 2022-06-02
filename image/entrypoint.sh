@@ -17,7 +17,7 @@ if [[ -z "${OCP_SERVER}" ]] || [[ -z "${OCP_PASS}" ]]; then
   print_log "Missing environment variable: OCP_SERVER and/or OCP_PASS"
   exit 1
 fi
-TMPDIR="$(mktemp -d)"
+TMPDIR="$(mktemp -d)" &> /dev/null
 KUTTL_REPO="${KUTTL_REPO:-"https://gitlab.cee.redhat.com/gitops/operator-e2e.git"}"
 REPO_DIR="${REPO_DIR:-"operator-e2e"}"
 OCP_USER="${OCP_USER:-"kubeadmin"}"
