@@ -13,7 +13,7 @@ $ make podman-build
 
 **2. Run it**:
 ```bash
-$ podman run -e OCP_SERVER=```<ocp_api_url>```bash -e OCP_PASS=```<user_password>```bash quay.io/<your_user>/kontainerized-kuttl
+$ podman run -e OCP_SERVER=<ocp_api_url> -e OCP_PASS=<user_password> quay.io/<your_user>/kontainerized-kuttl
 ```
 
 ---
