@@ -73,6 +73,7 @@ run_tests() {
   #
   ## TODO:
   ### Run all E2E suite and save result
+  ### (this is a single smoke test)
   kubectl kuttl test ./tests/parallel \
   --config ./tests/parallel/kuttl-test.yaml \
   --test 1-021_validate_rolebindings || return 4
