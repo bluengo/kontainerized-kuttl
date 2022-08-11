@@ -3,6 +3,10 @@ FROM registry.access.redhat.com/ubi8/ubi:latest
 # Install OC and Kubectl
 ADD files/oc-4.10.5-linux.tar.gz /usr/local/bin
 
+# Install Kuttl
+RUN curl -sSL -o /usr/local/bin/kubectl-kuttl https://github.com/kudobuilder/kuttl/releases/download/v0.12.1/kubectl-kuttl_0.12.1_linux_x86_64 &&\
+    chmod +x /usr/local/bin/kubectl-kuttl
+
 # Install git
 RUN dnf install -y git
 
