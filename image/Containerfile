@@ -8,7 +8,7 @@ RUN curl -sSL -o /usr/local/bin/kubectl-kuttl https://github.com/kudobuilder/kut
     chmod +x /usr/local/bin/kubectl-kuttl
 
 # Install dependencies
-RUN dnf install -y git jq
+RUN dnf install -y git jq openssl
 
 # Install ArgoCD CLI
 RUN curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64 &&\
