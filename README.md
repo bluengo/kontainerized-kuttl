@@ -6,12 +6,15 @@ This repo holds the container image and files to run kuttl tests against a remot
 The intention of this image is to be used within tekton pipelines to easily parallelize tests in multiple clusters and speed up E2E testing, but it can be used with Podman in a standalone way:
 
 **1. Build the image**:
+
 ```bash
 $ make podman-build
 ```
->   <font size="2">(by default it will set `quay.io/<your_username>/kontainerized-kuttl:latest` as the tag for the image. You can override that value by setting up the `$IMAGE` env var).</font>
+>	<font size="2">By default it will set `quay.io/<your_quay_username>/kontainerized-kuttl:latest` as the name for the image.</font>
+>   <font size="2">You can override that value by setting up the `$IMG` and `$TAG` env vars (`$IMG:$TAG`).</font>
 
 **2. Run it**:
+
 ```bash
 $ podman run -e OCP_SERVER=<ocp_api_url> -e OCP_PASS=<user_password> quay.io/<your_user>/kontainerized-kuttl
 ```
