@@ -1,6 +1,8 @@
 SHELL := /bin/bash
-USER_NAME = $(shell whoami)
-TAG ?= "quay.io/$(USER_NAME)/kontainerized-kuttl"
+QUAY_USER ?= $(shell whoami)
+TAG ?= latest
+IMG ?= quay.io/$(QUAY_USER)/kontainerized-kuttl:$(TAG)
+.DEFAULT_GOAL := all
 
 # Color and Formatting
 RED =\e[91m#  Red color
@@ -13,5 +15,12 @@ RST =\e[0m#   Reset format
 # Targets
 .PHONY: podman-build
 podman-build:
-	@echo -e "\nBuilding container image $(BLD)$(TAG)$(RST)..."
-	podman build -t $(TAG) ./image
+	@echo -e "\nBuilding container image $(BLD)$(IMG)$(RST)..."
+	podman build -t $(IMG) ./image
+
+.PHONY: podman-push
+podman-push:
+	podman push $(IMG)
+
+.PHONY: all
+all: podman-build podman-push
