@@ -65,7 +65,7 @@ oc_login() {
   --username="${OCP_USER}" \
   --password="${OCP_PASS}" \
   "${OCP_SERVER}" &> /dev/null || return 3
-  print_log "Info: Successfully loged into OCP cluster"
+  print_log "INFO: Successfully loged into OCP cluster"
 }
 
 run_tests() {
@@ -78,6 +78,7 @@ run_tests() {
   --config ./tests/parallel/kuttl-test.yaml \
   --test 1-021_validate_rolebindings || return 4
   popd
+  print_log "INFO: Kuttl test execution finished"
 }
 
 
