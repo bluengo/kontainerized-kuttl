@@ -1,17 +1,29 @@
 FROM registry.access.redhat.com/ubi8/ubi:latest
 
+ARG OS_TYPE="linux"
+ARG ARCH_X86="x86_64"
+ARG ARCH_AMD="amd64"
+ARG OC_VER="latest"
+ARG KUTTL_VER="0.14.0"
+ARG ARGOCD_VER="2.5.10"
+ARG OC_URL="https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OC_VER}"
+ARG KUTTL_URL="https://github.com/kudobuilder/kuttl/releases/download/v${KUTTL_VER}/kubectl-kuttl_${KUTTL_VER}_${OS_TYPE}_${ARCH_X86}"
+ARG ARGOCD_URL="https://github.com/argoproj/argo-cd/releases/${ARGOCD_VER}/download/argocd-${OS_TYPE}-${ARCH_AMD}"
+
+
 # Install OC and Kubectl
-ADD files/oc-4.10.5-linux.tar.gz /usr/local/bin
+RUN OC_VER=$(curl ${OC_URL}/release.txt | awk '/Version:/ {print $2}') &&\
+    curl -s -L ${OC_URL}/openshift-client-${OS_TYPE}-${OC_VER}.tar.gz | tar -xzf- -C /usr/local/bin oc kubectl
 
 # Install Kuttl
-RUN curl -sSL -o /usr/local/bin/kubectl-kuttl https://github.com/kudobuilder/kuttl/releases/download/v0.12.1/kubectl-kuttl_0.12.1_linux_x86_64 &&\
+RUN curl -sSL -o /usr/local/bin/kubectl-kuttl ${KUTTL_URL} &&\
     chmod +x /usr/local/bin/kubectl-kuttl
 
 # Install dependencies
 RUN dnf install -y git jq openssl
 
 # Install ArgoCD CLI
-RUN curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64 &&\
+RUN curl -sSL -o /usr/local/bin/argocd ${ARGOCD_URL} &&\
     chmod +x /usr/local/bin/argocd
 
 # Add Entrypoint
