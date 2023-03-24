@@ -9,6 +9,7 @@ ARG ARGOCD_VER="2.5.10"
 ARG OC_URL="https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OC_VER}"
 ARG KUTTL_URL="https://github.com/kudobuilder/kuttl/releases/download/v${KUTTL_VER}/kubectl-kuttl_${KUTTL_VER}_${OS_TYPE}_${ARCH_X86}"
 ARG ARGOCD_URL="https://github.com/argoproj/argo-cd/releases/${ARGOCD_VER}/download/argocd-${OS_TYPE}-${ARCH_AMD}"
+ARG E2E_BRANCH="master"
 
 
 # Install OC and Kubectl
@@ -20,7 +21,7 @@ RUN curl -sSL -o /usr/local/bin/kubectl-kuttl ${KUTTL_URL} &&\
     chmod +x /usr/local/bin/kubectl-kuttl
 
 # Install dependencies
-RUN dnf install -y git jq openssl
+RUN dnf install -y git jq openssl make
 
 # Install ArgoCD CLI
 RUN curl -sSL -o /usr/local/bin/argocd ${ARGOCD_URL} &&\

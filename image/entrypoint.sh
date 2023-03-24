@@ -70,13 +70,8 @@ oc_login() {
 
 run_tests() {
   pushd "${TMPDIR}/operator-e2e/gitops-operator" &> /dev/null
-  #
-  ## TODO:
-  ### Run all E2E suite and save result
-  ### (this is a single smoke test)
-  kubectl kuttl test ./tests/parallel \
-  --config ./tests/parallel/kuttl-test.yaml \
-  --test 1-021_validate_rolebindings || return 4
+  git checkout ${E2E_BRANCH} || { echo "Branch ${E2E_BRANCH} not found"; return 4; }
+  make e2e-tests || return 5
   popd
   print_log "INFO: Kuttl test execution finished"
 }
